@@ -138,8 +138,8 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </div>
         )}
 
-        {/* Main Content */}
-        <main className="flex-1 overflow-y-auto bg-gray-900 p-6">
+        {/* Main Content - Adicionado px-4 para padding horizontal consistente */}
+        <main className="flex-1 overflow-y-auto bg-gray-900 p-6 sm:px-6 px-4">
           {children}
         </main>
       </div>

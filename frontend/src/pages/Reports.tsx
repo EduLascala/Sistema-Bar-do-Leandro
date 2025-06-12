@@ -172,20 +172,19 @@ ${salesSummary.topProducts.slice(0, 5).map(([name, data]) =>
   };
 
   return (
-    // Removendo 'mx-auto' do container principal em mobile e usando 'p-4' para espaçamento
-    // 'max-w-7xl' para limitar a largura em telas muito grandes, 'w-full' para ocupar 100% em mobile
-    <div className="w-full max-w-7xl mx-auto min-h-screen flex flex-col p-4">
-      {/* Esta div interna deve ser flex-grow para ocupar o espaço restante */}
-      <div className="flex flex-col flex-grow">
+    // Removido 'container mx-auto' e 'p-4' daqui, pois o Layout.tsx já cuidará do padding principal.
+    // Esta div será flex-col para organizar seu conteúdo verticalmente.
+    <div className="w-full flex flex-col">
+      <div className="flex flex-col flex-grow"> {/* Flex-grow para ocupar espaço vertical disponível */}
         <div className="flex flex-col md:flex-row md:items-center justify-between mb-6">
           <h1 className="text-2xl font-bold mb-4 md:mb-0">Relatório de Vendas</h1>
 
           {/* Botões de ação: empilham em mobile, lado a lado em sm+ */}
-          {/* Adicionado 'flex-wrap' para quebrar a linha se o espaço for insuficiente */}
-          <div className="flex flex-wrap sm:flex-nowrap gap-2 w-full md:w-auto justify-center sm:justify-end">
+          {/* Alterado para forçar o empilhamento em mobile */}
+          <div className="flex flex-col sm:flex-row gap-2 w-full md:w-auto sm:justify-end">
             <button
               onClick={() => setIsDayClosingModalOpen(true)}
-              className="flex items-center justify-center px-4 py-2 bg-[#D4AF37] text-[#1C1C1E] hover:bg-[#D4AF37]/90 rounded-lg transition-colors flex-grow sm:flex-none sm:w-auto"
+              className="flex items-center justify-center px-4 py-2 bg-[#D4AF37] text-[#1C1C1E] hover:bg-[#D4AF37]/90 rounded-lg transition-colors w-full sm:w-auto"
             >
               <DollarSign className="w-5 h-5 mr-2" />
               Fechamento do Dia
@@ -194,7 +193,7 @@ ${salesSummary.topProducts.slice(0, 5).map(([name, data]) =>
             <button
               onClick={exportToCSV}
               disabled={filteredSales.length === 0}
-              className="flex items-center justify-center px-4 py-2 bg-[#2C2C2E] hover:bg-[#3C3C3E] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex-grow sm:flex-none sm:w-auto"
+              className="flex items-center justify-center px-4 py-2 bg-[#2C2C2E] hover:bg-[#3C3C3E] rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto"
             >
               <Download className="w-5 h-5 mr-2" />
               Exportar CSV
@@ -203,7 +202,6 @@ ${salesSummary.topProducts.slice(0, 5).map(([name, data]) =>
         </div>
 
         {/* Sales Summary Cards - Layout responsivo para os cards */}
-        {/* Usando 'grid-cols-1' em mobile, depois 'md:grid-cols-2' e 'lg:grid-cols-4' */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
           <div className="bg-[#2C2C2E] p-4 rounded-lg">
             <h3 className="text-[#A0A0A0] text-sm mb-2">Total em Vendas</h3>
@@ -251,9 +249,8 @@ ${salesSummary.topProducts.slice(0, 5).map(([name, data]) =>
         </div>
 
         {/* Filters Section - layout flexível com quebra de linha em mobile */}
-        {/* Adicionado 'flex-wrap' para os filtros se quebrarem em linha */}
         <div className="bg-[#2C2C2E] rounded-lg shadow-lg p-4 mb-6">
-          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 flex-wrap"> {/* Adicionado flex-wrap aqui */}
+          <div className="flex flex-col md:flex-row items-start md:items-center gap-4 flex-wrap">
             {/* Cada filtro agora tem 'w-full' para ocupar a largura total em mobile */}
             <div className="w-full md:w-auto flex-grow">
               <label htmlFor="dateFilter" className="block text-sm font-medium text-[#A0A0A0] mb-1">
@@ -332,99 +329,133 @@ ${salesSummary.topProducts.slice(0, 5).map(([name, data]) =>
           </div>
         </div>
 
-        {/* Sales Table - Ajustes para rolagem em mobile */}
-        {/* A tabela agora deve ser o único elemento a "esticar" na altura, e ter seu próprio overflow */}
-        <div className="bg-[#2C2C2E] rounded-lg shadow-lg overflow-hidden flex-1 flex flex-col">
-          {/* Adicionando max-h-full e overflow-y-auto para a tabela */}
-          {/* Isso permite que a tabela role seu próprio conteúdo se for muito longa */}
-          <div className="overflow-x-auto flex-1 max-h-full">
-            <table className="min-w-full divide-y divide-gray-700">
-              <thead className="bg-[#1C1C1E] sticky top-0 z-10">
+        {/* Sales Table - DESKTOP/TABLET VIEW (standard table) */}
+        <div className="bg-[#2C2C2E] rounded-lg shadow-lg overflow-hidden hidden sm:block"> {/* Hidden on small screens, shown on sm+ */}
+          <table className="min-w-full divide-y divide-gray-700">
+            <thead className="bg-[#1C1C1E] sticky top-0 z-10">
+              <tr>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
+                  <button className="flex items-center focus:outline-none" onClick={() => toggleSort('date')}>
+                    Data/Hora
+                    <ArrowDownUp className={`w-4 h-4 ml-1 ${sortBy === 'date' ? 'text-[#D4AF37]' : 'text-[#A0A0A0]'}`} />
+                  </button>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
+                  Mesa
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider"> {/* No hidden here, showing all columns on desktop/tablet */}
+                  Itens
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
+                  <button className="flex items-center focus:outline-none" onClick={() => toggleSort('amount')}>
+                    Total
+                    <ArrowDownUp className={`w-4 h-4 ml-1 ${sortBy === 'amount' ? 'text-[#D4AF37]' : 'text-[#A0A0A0]'}`} />
+                  </button>
+                </th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider"> {/* No hidden here, showing all columns on desktop/tablet */}
+                  Pagamento
+                </th>
+                <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
+                  Ações
+                </th>
+              </tr>
+            </thead>
+            <tbody className="bg-[#2C2C2E] divide-y divide-gray-700">
+              {filteredSales.length === 0 ? (
                 <tr>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                    <button
-                      className="flex items-center focus:outline-none"
-                      onClick={() => toggleSort('date')}
-                    >
-                      Data/Hora
-                      <ArrowDownUp className={`w-4 h-4 ml-1 ${sortBy === 'date' ? 'text-[#D4AF37]' : 'text-[#A0A0A0]'}`} />
-                    </button>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                    Mesa
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider hidden sm:table-cell"> {/* Esconder em telas pequenas */}
-                    Itens
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                    <button
-                      className="flex items-center focus:outline-none"
-                      onClick={() => toggleSort('amount')}
-                    >
-                      Total
-                      <ArrowDownUp className={`w-4 h-4 ml-1 ${sortBy === 'amount' ? 'text-[#D4AF37]' : 'text-[#A0A0A0]'}`} />
-                    </button>
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-[#A0A0A0] uppercase tracking-wider hidden sm:table-cell"> {/* Esconder em telas pequenas */}
-                    Pagamento
-                  </th>
-                  <th scope="col" className="px-6 py-3 text-right text-xs font-medium text-[#A0A0A0] uppercase tracking-wider">
-                    Ações
-                  </th>
+                  <td colSpan={6} className="px-6 py-4 text-center text-[#A0A0A0]">
+                    Nenhuma venda encontrada
+                  </td>
                 </tr>
-              </thead>
-              <tbody className="bg-[#2C2C2E] divide-y divide-gray-700">
-                {filteredSales.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="px-6 py-4 text-center text-[#A0A0A0]">
-                      Nenhuma venda encontrada
+              ) : (
+                filteredSales.map((sale) => (
+                  <tr
+                    key={sale.id}
+                    className="hover:bg-[#3C3C3E] cursor-pointer"
+                    onClick={() => showSaleDetails(sale)}
+                  >
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      {formatDate(sale.timestamp)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm">
+                      Mesa {sale.tableId}
+                    </td>
+                    <td className="px-6 py-4 text-sm"> {/* Show on desktop/tablet */}
+                      <div className="line-clamp-1">
+                        {sale.items.map((item: SaleItem, index) => (
+                          <span key={index}>
+                            {index > 0 && ', '}
+                            {item.quantity}x {item.productName}
+                          </span>
+                        ))}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                      R$ {sale.totalAmount.toFixed(2)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm"> {/* Show on desktop/tablet */}
+                      {getPaymentMethodName(sale.paymentMethod)}
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap text-right">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleCancelSale(sale.id);
+                        }}
+                        className="p-1.5 text-[#FF3B30] hover:bg-[#FF3B30]/20 rounded-lg transition-colors"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </td>
                   </tr>
-                ) : (
-                  filteredSales.map((sale) => (
-                    <tr
-                      key={sale.id}
-                      className="hover:bg-[#3C3C3E] cursor-pointer"
-                      onClick={() => showSaleDetails(sale)}
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Sales List - MOBILE VIEW (card-like) */}
+        <div className="bg-[#2C2C2E] rounded-lg shadow-lg sm:hidden"> {/* Hidden on sm+ screens, shown on small screens */}
+          <div className="divide-y divide-gray-700">
+            {filteredSales.length === 0 ? (
+              <div className="p-4 text-center text-[#A0A0A0]">
+                Nenhuma venda encontrada
+              </div>
+            ) : (
+              filteredSales.map((sale) => (
+                <div
+                  key={sale.id}
+                  className="p-4 hover:bg-[#3C3C3E] cursor-pointer flex flex-col space-y-2"
+                  onClick={() => showSaleDetails(sale)}
+                >
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium text-sm">{formatDate(sale.timestamp)}</span>
+                    <span className="font-medium text-sm">Mesa {sale.tableId}</span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="text-[#A0A0A0] text-sm">Total:</span>
+                    <span className="font-bold text-base text-white">R$ {sale.totalAmount.toFixed(2)}</span>
+                  </div>
+                  <div className="text-[#A0A0A0] text-xs">
+                    Itens: <span className="text-white line-clamp-1">{sale.items.map(item => `${item.quantity}x ${item.productName}`).join(', ')}</span>
+                  </div>
+                  <div className="text-[#A0A0A0] text-xs">
+                    Pagamento: <span className="text-white">{getPaymentMethodName(sale.paymentMethod)}</span>
+                  </div>
+                  <div className="flex justify-end mt-2">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCancelSale(sale.id);
+                      }}
+                      className="p-1.5 text-[#FF3B30] hover:bg-[#FF3B30]/20 rounded-lg transition-colors"
                     >
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {formatDate(sale.timestamp)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        Mesa {sale.tableId}
-                      </td>
-                      <td className="px-6 py-4 text-sm hidden sm:table-cell"> {/* Esconder em telas pequenas */}
-                        <div className="line-clamp-1">
-                          {sale.items.map((item: SaleItem, index) => (
-                            <span key={index}>
-                              {index > 0 && ', '}
-                              {item.quantity}x {item.productName}
-                            </span>
-                          ))}
-                        </div>
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                        R$ {sale.totalAmount.toFixed(2)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm hidden sm:table-cell"> {/* Esconder em telas pequenas */}
-                        {getPaymentMethodName(sale.paymentMethod)}
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleCancelSale(sale.id);
-                          }}
-                          className="p-1.5 text-[#FF3B30] hover:bg-[#FF3B30]/20 rounded-lg transition-colors"
-                        >
-                          <Trash2 className="w-4 h-4" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))
-                )}
-              </tbody>
-            </table>
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              ))
+            )}
           </div>
         </div>
       </div>
@@ -573,7 +604,7 @@ ${salesSummary.topProducts.slice(0, 5).map(([name, data]) =>
                     <div key={name} className="flex justify-between">
                       <span className="text-[#A0A0A0]">{name}:</span>
                       <span className="font-medium">
-                        {data.quantity}x (R$ {(data.total ?? 0).toFixed(2)})
+                        {data.quantity}x (R$ ${(data.total ?? 0).toFixed(2)})
                       </span>
                     </div>
                   ))}
