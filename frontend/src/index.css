@@ -1,0 +1,15 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html, body, #root {
+  height: 100%; /* Garante que ocupem a altura total da viewport */
+  margin: 0; /* Remove margens padrão do navegador */
+  padding: 0; /* Remove preenchimentos padrão do navegador */
+  overflow-x: hidden; /* Evita rolagem horizontal indesejada em todo o documento */
+}
+
+/* Opcional: para o fundo da página se estender */
+body {
+  background-color: #121212; /* Ou a cor de fundo que você está usando */
+}
